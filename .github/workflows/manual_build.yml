@@ -1,36 +1,42 @@
-name: 手动构建 Windows 版 (适配 ComfyUI)
+name: 手动构建 Windows 版 (复用原流程)
 
-# 改为手动触发，出现 "Run workflow" 按钮
 on:
   workflow_dispatch:
     inputs:
       flash_attn_version:
-        description: 'Flash Attention 版本'
+        description: 'Flash Attention 版本 (注意：不要带 v 前缀！例如填 2.6.3)'
         required: true
-        default: 'v2.8.3'
+        default: '2.8.3' 
       python_version:
         description: 'Python 版本'
         required: true
         default: '3.12'
       torch_version:
-        description: 'PyTorch 版本 (不带前缀)'
+        description: 'PyTorch 版本'
         required: true
         default: '2.8.0'
       cuda_version:
         description: 'CUDA 版本'
         required: true
         default: '12.9.0'
+      is_upload:
+        description: '构建完成后是否上传到 Release'
+        type: boolean
+        default: true
 
 jobs:
   build_windows_manual:
-    name: 开始构建
-    # 直接调用你之前上传的 _build_windows.yml 核心逻辑
-    # 请确保你的仓库里有 .github/workflows/_build_windows.yml 这个文件
+    name: 调用原构建流程
+    # 这里的路径必须指向你仓库里实际存在的那个 _build_windows.yml 文件
     uses: ./.github/workflows/_build_windows.yml
     with:
+      # 这里把输入的纯数字版本号传给下游，下游脚本会自动拼上 'v'
       flash-attn-version: ${{ inputs.flash_attn_version }}
       python-version: ${{ inputs.python_version }}
       torch-version: ${{ inputs.torch_version }}
       cuda-version: ${{ inputs.cuda_version }}
-    # 这一行很重要，确保有权限上传构建结果
+      # 显式指定 Runner，保持和原配置一致
+      runner: "windows-2022"
+      is-upload: ${{ inputs.is_upload }}
+    # 必须继承权限，否则无法上传 Release
     secrets: inherit
