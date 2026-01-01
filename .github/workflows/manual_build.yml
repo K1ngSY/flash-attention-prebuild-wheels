@@ -1,0 +1,36 @@
+name: 手动构建 Windows 版 (适配 ComfyUI)
+
+# 改为手动触发，出现 "Run workflow" 按钮
+on:
+  workflow_dispatch:
+    inputs:
+      flash_attn_version:
+        description: 'Flash Attention 版本'
+        required: true
+        default: 'v2.8.3'
+      python_version:
+        description: 'Python 版本'
+        required: true
+        default: '3.12'
+      torch_version:
+        description: 'PyTorch 版本 (不带前缀)'
+        required: true
+        default: '2.8.0'
+      cuda_version:
+        description: 'CUDA 版本'
+        required: true
+        default: '12.9.0'
+
+jobs:
+  build_windows_manual:
+    name: 开始构建
+    # 直接调用你之前上传的 _build_windows.yml 核心逻辑
+    # 请确保你的仓库里有 .github/workflows/_build_windows.yml 这个文件
+    uses: ./.github/workflows/_build_windows.yml
+    with:
+      flash-attn-version: ${{ inputs.flash_attn_version }}
+      python-version: ${{ inputs.python_version }}
+      torch-version: ${{ inputs.torch_version }}
+      cuda-version: ${{ inputs.cuda_version }}
+    # 这一行很重要，确保有权限上传构建结果
+    secrets: inherit
