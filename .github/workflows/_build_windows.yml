@@ -39,8 +39,8 @@ jobs:
     name: Build wheels and Upload (Windows x86_64, GitHub hosted runner)
     runs-on: ${{ inputs.runner }}
     env:
-      MAX_JOBS: 2
-      NVCC_THREADS: 2
+      MAX_JOBS: 1
+      NVCC_THREADS: 1
       TORCH_CUDA_ARCH_LIST: "8.0;8.6;8.9"
     steps:
       - uses: actions/checkout@v4
